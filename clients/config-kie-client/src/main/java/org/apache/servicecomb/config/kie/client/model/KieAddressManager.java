@@ -19,49 +19,28 @@ package org.apache.servicecomb.config.kie.client.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Random;
 
 public class KieAddressManager {
-
-  private final Properties properties;
-
   private final List<String> addresses;
 
-  private final Map<String, String> configKey;
+  private int index = 0;
 
-  private int index;
-
-  public KieAddressManager(Properties properties, List<String> addresses, Map<String, String> configKey) {
-    this.properties = properties;
+  public KieAddressManager(List<String> addresses) {
     this.addresses = new ArrayList<>(addresses.size());
-    this.configKey = configKey;
-    addresses.forEach((address -> this.addresses.add(address)));
-    this.index = new Random().nextInt(addresses.size());
+    this.addresses.addAll(addresses);
   }
-
-  public String nextAddress() {
+  
+  public String address() {
     synchronized (this) {
       this.index++;
       if (this.index >= addresses.size()) {
         this.index = 0;
       }
-    }
-    return address();
-  }
-
-  public String address() {
-    synchronized (this) {
       return addresses.get(index);
     }
   }
 
-  public Properties getProperties() {
-    return properties;
-  }
-
-  public Map<String, String> getConfigKey() {
-    return configKey;
+  public boolean sslEnabled() {
+    return address().startsWith("https://");
   }
 }
